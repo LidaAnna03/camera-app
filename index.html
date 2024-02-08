@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Responsive Camera App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: black;
+        color: white;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden; /* Prevent horizontal scroll */
+      }
+
+      .app {
+        width: 95%;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #333;
+        border-radius: 10px;
+        background-color: #222;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column; /* Ensure content flows vertically */
+        justify-content: space-between; /* Fill available vertical space */
+        height: 100vh; /* Fill the viewport height */
+      }
+
+      .header,
+      .footer {
+        text-align: center;
+        background-color: #1c0f0f;
+        border-radius: 5px;
+        margin-bottom: 50px;
+        padding: 40px; /* Add padding for spacing */
+      }
+
+      .header p,
+      .footer p {
+        margin: 5px 0; /* Add margin for spacing between lines */
+      }
+
+      .main {
+        text-align: center;
+        background-color: #383535;
+        border-radius: 5px;
+        flex-grow: 1; /* Allow the main content area to grow to fill available space */
+        display: flex;
+        flex-direction: column; /* Ensure content flows vertically */
+      }
+
+      video {
+        max-width: 100%;
+        height: auto;
+        max-width: 100%;
+        /*max-height: calc(100% - 80px);*/
+
+        /* Set max height to fill available space, accounting for header and controls */
+        border-radius: 5px;
+        border: 2px solid white;
+        margin-bottom: 10px;
+        transition: transform 0.3s ease-in-out;
+        align-self: center; /* Center the video horizontally */
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-around;
+      }
+
+      button {
+        padding: 10px;
+        background-color: white;
+        color: black;
+        border: 1px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .redCircle {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        background-color: red;
+        border-radius: 50%;
+        margin-left: 7px;
+        margin-bottom: -3px;
+      }
+
+      p {
+        color: white;
+        margin: 1; /* Remove default margin to eliminate blank space */
+      }
+
+      /* Media Query for Samsung Galaxy Screens */
+      @media screen and (max-width: 480px) {
+        video {
+          max-height: calc(
+            100% - 60px
+          ); /* Adjust max-height for smaller screens */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="header">
+        <p id="currentDateTime">00:00:00</p>
+        <p>Recording<span class="redCircle"></span></p>
+      </div>
+
+      <div class="main">
+        <video id="cameraFeed" autoplay playsinline></video>
+        <div class="controls">
+          <button onclick="magnify()">+</button>
+          <button onclick="diminish()">-</button>
+          <button onclick="pauseResume()">P</button>
+          <button onclick="captureImage()">C</button>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Mount Carmel Church,</p>
+        <p>Carmelaram, Sarjapur Road,</p>
+        <p>Carmelaram Post,</p>
+        <p>Bengaluru 560 035</p>
+      </div>
+    </div>
+
+    <script>
+      const video = document.getElementById("cameraFeed");
+      let isPaused = false;
+      let zoomLevel = 1.0;
+
+      function updateDateTime() {
+        const currentDateTimeElement =
+          document.getElementById("currentDateTime");
+        const currentDate = new Date();
+        const hours = currentDate.getHours().toString().padStart(2, "0");
+        const minutes = currentDate.getMinutes().toString().padStart(2, "0");
+        const seconds = currentDate.getSeconds().toString().padStart(2, "0");
+        currentDateTimeElement.textContent = `${hours}:${minutes}:${seconds}`;
+      }
+
+      updateDateTime();
+
+      navigator.mediaDevices
+        .getUserMedia({
+          video: true,
+        })
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((error) => {
+          console.error("Error accessing the camera:", error);
+        });
+
+      function magnify() {
+        zoomLevel += 0.1;
+        applyZoom();
+      }
+
+      function diminish() {
+        zoomLevel -= 0.1;
+        applyZoom();
+      }
+
+      function applyZoom() {
+        video.style.transform = `scale(${zoomLevel})`;
+      }
+
+      function pauseResume() {
+        if (isPaused) {
+          video.play();
+          isPaused = false;
+        } else {
+          video.pause();
+          isPaused = true;
+        }
+      }
+
+      function captureImage() {
+        alert("Capturing Image...");
+      }
+
+      setInterval(updateDateTime, 1000);
+    </script>
+  </body>
+</html>
